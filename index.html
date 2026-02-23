@@ -578,6 +578,19 @@
             cursor: pointer;
         }
 
+        /* 🟢 修复管理页的分类按钮 */
+        .filter-btn {
+            color: var(--text-secondary) !important; /* 未选中时是清晰的浅灰色 */
+        }
+        
+        /* 选中的按钮变成半透明果冻色，文字变成你的专属主题色 */
+        .filter-btn.active {
+            background: rgba(255, 255, 255, 0.6) !important; /* 改成 0.6 的半透明白，不突兀 */
+            color: var(--accent) !important; /* 文字跟随粉色主题色！ */
+            box-shadow: 0 2px 8px rgba(255, 105, 180, 0.15); /* 淡淡的粉色发光 */
+            font-weight: 700;
+        }
+
         .filter-btn.active {
             background: var(--accent);
             color: white;
@@ -1528,24 +1541,35 @@
             </div>
         </div>
 
-        <div v-if="currentPage === 'manage'" class="page">
-            <div class="page-header">
-                <h1 class="page-title">管理 API Key</h1>
-                <div class="header-actions">
-                    <button class="header-btn" :class="{ active: isEditMode }" @click="isEditMode = !isEditMode">
-                        {{ isEditMode ? '完成' : '编辑' }}
-                    </button>
-                    <button class="header-btn" @click="currentPage = 'add'">
-                        <span class="svg-icon small" v-html="icons.add"></span>
-                    </button>
-                </div>
-            </div>
+        <div v-if="currentPage === 'manage'" class="tab-content animate-fade-in" style="padding: 16px; margin-bottom: 80px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                <div class="section-card" style="background: rgba(255, 255, 255, 0.7) !important; border: 1px solid rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 20px; border-radius: 24px; box-shadow: 0 8px 32px rgba(255,105,180,0.1);">
+                    
+                    <div class="page-header" style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; background: transparent;">
+                        <h1 class="page-title" style="color: var(--accent); font-weight: 800; font-size: 24px; text-shadow: 2.5px 0 #fff, -2.5px 0 #fff, 0 2.5px #fff, 0 -2.5px #fff, 0 4px 10px rgba(0,0,0,0.1);">
+                            管理 API Key
+                        </h1>
+                        <div class="header-actions" style="display: flex; gap: 8px;">
+                            <button class="header-btn circular" @click="isEditMode = !isEditMode" style="width: auto; padding: 0 12px; border-radius: 12px; font-size: 13px; font-weight: 600; background: white !important; color: var(--accent) !important; border: 1.5px solid rgba(255,105,180,0.1);">
+                                {{ isEditMode ? '完成' : '编辑' }}
+                            </button>
+                            <button class="header-btn circular" @click="currentPage = 'add'" style="background: white !important; color: var(--accent) !important; border: 1.5px solid rgba(255,105,180,0.1);">
+                                <span class="svg-icon small" v-html="icons.add"></span>
+                            </button>
+                        </div>
+                    </div>
 
-            <div class="filter-bar">
-                <button class="filter-btn" :class="{ active: !filterPlatform }" @click="filterPlatform = ''">全部</button>
-                <button v-for="p in platformsWithKeys" :key="p.id" class="filter-btn"
-                    :class="{ active: filterPlatform === p.id }" @click="filterPlatform = p.id">{{ p.name }}</button>
-            </div>
+                    <div class="filter-bar" style="background: rgba(255, 255, 255, 0.4); padding: 4px; border-radius: 14px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.5); display: flex; gap: 4px;">
+                        <button class="filter-btn" :class="{ active: !filterPlatform }" @click="filterPlatform = ''" 
+                                style="flex: 1; border-radius: 10px; padding: 8px; font-size: 13px; border: none; transition: all 0.3s; background: transparent;">
+                            全部
+                        </button>
+                        <button v-for="p in platformsWithKeys" :key="p.id" class="filter-btn"
+                            :class="{ active: filterPlatform === p.id }" @click="filterPlatform = p.id"
+                            style="flex: 1; border-radius: 10px; padding: 8px; font-size: 13px; border: none; transition: all 0.3s; background: transparent;">
+                            {{ p.name }}
+                        </button>
+                    </div>
+                </div> 
 
             <div v-if="groupedKeys.length === 0" class="empty-state">
                 <div class="empty-icon">
@@ -1570,7 +1594,7 @@
                         </div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <button class="header-btn" style="width: 28px; height: 28px; font-size: 14px;"
+                        <button class="header-btn" style="width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(255,105,180,0.1); color: var(--accent); display: flex; align-items: center; justify-content: center;"
                             @click.stop="openPlatformSettings(group.platform)">
                             <span class="svg-icon small" v-html="icons.settings"></span>
                         </button>
@@ -1626,39 +1650,86 @@
                 </div>
             </div>
         </div>
-
-        <div v-if="currentPage === 'stats'" class="page">
-            <h1 class="page-title">用量统计</h1>
-
-            <div class="chart-tabs">
-                <button class="chart-tab" :class="{ active: chartPeriod === '7d' }"
-                    @click="chartPeriod = '7d'">近7天</button>
-                <button class="chart-tab" :class="{ active: chartPeriod === '30d' }"
-                    @click="chartPeriod = '30d'">近30天</button>
-                <button class="chart-tab" :class="{ active: chartPeriod === '90d' }"
-                    @click="chartPeriod = '90d'">近90天</button>
+<!-- 临时 -->
+<div v-if="currentPage === 'stats'" class="page">
+            <div class="page-header" style="margin-bottom: 20px;">
+                <h1 class="page-title" style="color: var(--accent); font-weight: 800; font-size: 24px; text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff;">
+                    数据统计
+                </h1>
             </div>
 
-            <div class="chart-container" ref="chartContainer"></div>
+            <div style="display: flex; background: rgba(255,255,255,0.5); border-radius: 16px; padding: 4px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
+                <button @click="statsTab = 'chart'" 
+                        :style="{ flex: 1, padding: '10px 0', borderRadius: '12px', border: 'none', fontSize: '14px', fontFamily: 'inherit', fontWeight: 'bold', transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)', background: statsTab === 'chart' ? 'white' : 'transparent', color: statsTab === 'chart' ? 'var(--accent)' : 'var(--text-secondary)', boxShadow: statsTab === 'chart' ? '0 2px 10px rgba(255,105,180,0.15)' : 'none', cursor: 'pointer' }">
+                    📊 图表排行
+                </button>
+                <button @click="statsTab = 'calendar'" 
+                        :style="{ flex: 1, padding: '10px 0', borderRadius: '12px', border: 'none', fontSize: '14px', fontFamily: 'inherit', fontWeight: 'bold', transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)', background: statsTab === 'calendar' ? 'white' : 'transparent', color: statsTab === 'calendar' ? 'var(--accent)' : 'var(--text-secondary)', boxShadow: statsTab === 'calendar' ? '0 2px 10px rgba(255,105,180,0.15)' : 'none', cursor: 'pointer' }">
+                    📅 消费日历
+                </button>
+            </div>
 
-            <div class="stats-panel">
-                <div class="stats-header">
-                    <span class="stats-title">平台用量排行</span>
+            <div v-if="statsTab === 'chart'">
+                <div class="chart-tabs">
+                    <button class="chart-tab" :class="{ active: chartPeriod === '7d' }" @click="chartPeriod = '7d'">近7天</button>
+                    <button class="chart-tab" :class="{ active: chartPeriod === '30d' }" @click="chartPeriod = '30d'">近30天</button>
+                    <button class="chart-tab" :class="{ active: chartPeriod === '90d' }" @click="chartPeriod = '90d'">近90天</button>
                 </div>
-                <div class="stats-list">
-                    <div v-for="(item, index) in usageRanking" :key="item.platform" class="stats-row">
-                        <div class="stats-row-left">
-                            <span style="width: 20px; font-size: 12px; color: var(--text-tertiary);">{{ index + 1
-                                }}</span>
-                            <span class="svg-icon small" v-html="item.icon" style="margin-right: 8px;"></span>
-                            <span class="stats-name">{{ item.name }}</span>
+
+                <div class="chart-container" ref="chartContainer" style="background: rgba(255, 255, 255, 0.7) !important; border: 1px solid rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);"></div>
+
+                <div class="stats-panel" style="background: rgba(255, 255, 255, 0.7) !important; border: 1px solid rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
+                    <div class="stats-header">
+                        <span class="stats-title" style="color: var(--accent); font-weight: 700;">平台用量排行</span>
+                    </div>
+                    <div class="stats-list">
+                        <div v-for="(item, index) in usageRanking" :key="item.platform" class="stats-row">
+                            <div class="stats-row-left">
+                                <span style="width: 20px; font-size: 12px; color: var(--text-tertiary);">{{ index + 1 }}</span>
+                                <img :src="'https://www.google.com/s2/favicons?sz=64&domain_url=' + (item.signInUrl || 'google.com')"
+                                     style="width: 20px; height: 20px; border-radius: 4px; margin-right: 8px;"
+                                     @error="$event.target.style.display='none'">
+                                <span class="stats-name">{{ item.name }}</span>
+                            </div>
+                            <span class="stats-amount" style="font-weight: 600;">{{ formatCurrency(item.usage, item.currency) }}</span>
                         </div>
-                        <span class="stats-amount">{{ formatCurrency(item.usage, item.currency) }}</span>
                     </div>
                 </div>
             </div>
-        </div>
 
+            <div v-if="statsTab === 'calendar'">
+                <div class="stats-panel" style="background: rgba(255, 255, 255, 0.7) !important; border: 1px solid rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
+                    <div class="stats-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(255,105,180,0.2); padding: 16px;">
+                        <button @click="prevMonth" style="background: white; border: none; width: 32px; height: 32px; border-radius: 50%; color: var(--accent); cursor: pointer; box-shadow: 0 2px 8px rgba(255,105,180,0.15); font-size: 14px; display: flex; align-items: center; justify-content: center;">◀</button>
+                        <span class="stats-title" style="color: var(--accent); font-weight: 800; font-size: 16px; text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;">
+                            {{ currentMonth.getFullYear() }}年{{ currentMonth.getMonth() + 1 }}月
+                        </span>
+                        <button @click="nextMonth" style="background: white; border: none; width: 32px; height: 32px; border-radius: 50%; color: var(--accent); cursor: pointer; box-shadow: 0 2px 8px rgba(255,105,180,0.15); font-size: 14px; display: flex; align-items: center; justify-content: center;">▶</button>
+                    </div>
+                    
+                    <div style="padding: 16px;">
+                        <div style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 13px; color: var(--text-tertiary); margin-bottom: 12px; font-weight: 700;">
+                            <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;">
+                            <div v-for="(day, index) in calendarData" :key="index" 
+                                 style="aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; transition: all 0.3s;"
+                                 :style="{
+                                     background: day.spent > 0 ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.3)',
+                                     boxShadow: day.spent > 0 ? '0 4px 10px rgba(255, 105, 180, 0.15)' : 'none',
+                                     opacity: day.isCurrentMonth ? 1 : 0.3
+                                 }">
+                                <span style="font-size: 14px; font-weight: 700;" :style="{ color: day.spent > 0 ? 'var(--text-primary)' : 'var(--text-secondary)' }">{{ day.day }}</span>
+                                <span v-if="day.spent > 0" style="font-size: 9px; color: var(--accent); font-weight: 800; margin-top: 2px;">
+                                    ¥{{ day.spent < 1 ? day.spent.toFixed(2) : day.spent.toFixed(1) }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+<!-- 删改部分加日历 -->
         <div v-if="currentPage === 'settings'" class="page">
             <h1 class="page-title">设置</h1>
             <!-- 1.修改部分，增加颜色选项 2、增加了心形覆盖图标 -->
@@ -1901,7 +1972,74 @@
                     localStorage.setItem('themeColor', newColor);
                 }, { immediate: true });
                 // 到这
+                // 增加日历功能
+                // 🟢 芥末泥特制：消费日历逻辑
+                const currentMonth = ref(new Date());
 
+                const prevMonth = () => {
+                    currentMonth.value = new Date(currentMonth.value.getFullYear(), currentMonth.value.getMonth() - 1, 1);
+                };
+                const nextMonth = () => {
+                    currentMonth.value = new Date(currentMonth.value.getFullYear(), currentMonth.value.getMonth() + 1, 1);
+                };
+
+                const calendarData = computed(() => {
+                    const year = currentMonth.value.getFullYear();
+                    const month = currentMonth.value.getMonth();
+                    
+                    const firstDay = new Date(year, month, 1);
+                    const lastDay = new Date(year, month + 1, 0);
+                    
+                    const days = [];
+                    // 填充上个月的空白
+                    const startPadding = firstDay.getDay(); 
+                    for (let i = startPadding - 1; i >= 0; i--) {
+                        const d = new Date(year, month, -i);
+                        days.push({ day: d.getDate(), date: d, isCurrentMonth: false, spent: 0 });
+                    }
+                    
+                    // 填充本月
+                    for (let i = 1; i <= lastDay.getDate(); i++) {
+                        const d = new Date(year, month, i);
+                        days.push({ day: i, date: d, isCurrentMonth: true, spent: 0 });
+                    }
+                    
+                    // 填充下个月的空白
+                    const endPadding = 42 - days.length; // 保持 6 行高度
+                    for (let i = 1; i <= endPadding; i++) {
+                        const d = new Date(year, month + 1, i);
+                        days.push({ day: d.getDate(), date: d, isCurrentMonth: false, spent: 0 });
+                    }
+                    
+                    // 统计每天的花费，统一折算成人民币
+                    const dailySpentMap = {};
+                    platforms.value.forEach(platform => {
+                        if (platform.unmetered || !platform.balance || !platform.balance.history) return;
+                        
+                        const currency = platform.currency || platform.balance.currency || 'CNY';
+                        let rate = 1;
+                        if (currency === 'USD') rate = exchangeRates.value.USD || 7.25;
+                        else if (currency === 'EUR') rate = exchangeRates.value.EUR || 7.85;
+
+                        platform.balance.history.forEach(record => {
+                            if (!record.date) return;
+                            const dateStr = record.date.split('T')[0];
+                            if (!dailySpentMap[dateStr]) dailySpentMap[dateStr] = 0;
+                            dailySpentMap[dateStr] += (record.used || 0) * rate;
+                        });
+                    });
+
+                    // 映射到具体的格子里
+                    days.forEach(dayObj => {
+                        const localDateStr = new Date(dayObj.date.getTime() - (dayObj.date.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+                        if (dailySpentMap[localDateStr]) {
+                            dayObj.spent = dailySpentMap[localDateStr];
+                        }
+                    });
+
+                    return days;
+                });
+                // 增加日历功能，到这
                 // 增加背景上传功能
                 // 🟢 芥末泥的壁纸引擎
                 const customBg = ref(localStorage.getItem('customBg') || '');
@@ -1970,7 +2108,9 @@
                     home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
                     list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
                     chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
-                    settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+                    // 🟢 芥末泥特供：把设置的“黑色齿轮花”变成小爱心
+                    // 🟢 芥末泥特供：完美的实心小爱心
+                    settings: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
                     add: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
                     // 🟢 芥末泥特供：极简纤细版双箭头循环
                     refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>',
@@ -2106,6 +2246,18 @@
                         icon: icons.openrouter,
                         note: ''
                     },
+                    {
+                        id: 'minimax',
+                        name: 'MiniMax',
+                        baseUrl: 'https://api.minimax.chat/v1',
+                        signInUrl: 'https://platform.minimaxi.com/user-center/payment/balance', // 🟢 芥末泥幫你換成了餘額直達網址
+                        balanceApi: '', 
+                        balancePath: 'data.total_balance', // 預留路徑
+                        currency: 'CNY',
+                        balanceType: 'currency',
+                        icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>', 
+                        note: ''
+                    },
                 ];
 
                 const currentPage = ref('home');
@@ -2114,6 +2266,7 @@
                 const filterPlatform = ref('');
                 const isEditMode = ref(false);
                 const chartPeriod = ref('30d');
+                const statsTab = ref('chart');
                 const chartContainer = ref(null);
                 let chart = null;
 
@@ -2308,6 +2461,7 @@
                                 platform: platform.id,
                                 name: platform.name,
                                 icon: platform.icon || icons.custom,
+                                signInUrl: platform.signInUrl, // 🟢 芥末泥新增：把网址带过来抓图片
                                 usage: 0,
                                 currency: platform.currency || platform.balance?.currency || 'CNY'
                             };
@@ -3351,8 +3505,8 @@
                 }
 
                 watch(chartPeriod, updateChart);
-                watch(currentPage, (newPage) => {
-                    if (newPage === 'stats') {
+                watch([currentPage, statsTab], () => {
+                    if (currentPage.value === 'stats' && statsTab.value === 'chart') {
                         nextTick(() => {
                             initChart();
                         });
@@ -3374,6 +3528,11 @@
                     handleBgUpload, // 🟢 
                     clearBg,        // 🟢
                     platformsWithKeys, // 补上这个，解决控制台那个黄色警告
+                    currentMonth,   // 🟢 加这行 日历功能变量
+                    prevMonth,      // 🟢 加这行
+                    nextMonth,      // 🟢 加这行
+                    calendarData,   // 🟢 加这行
+                    statsTab,//切换开关变量
                     exchangeRates,
                     fetchExchangeRates,
                     currentPage,
