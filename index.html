@@ -31,18 +31,59 @@
             --accent: #007AFF;
             --warning: #FF3B30;
             --success: #34C759;
-            --card-radius: 12px;
-            --btn-radius: 8px;
-            --input-radius: 8px;
-            --modal-radius: 16px;
+            /* 改了数值 */
+            --card-radius: 20px;
+            --btn-radius: 14px;
+            --input-radius: 12px;
+            --modal-radius: 24px;
+            /* 到这 */
         }
 
+        /* 改了背景颜色 */
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
-            background: var(--bg-tertiary);
+            /* 🟢 梦幻棉花糖渐变：从浅粉过渡到淡紫 */
+            background: linear-gradient(135deg, #edffff 0%, #FFE4E1 50%, #f1f1ff 100%);
+            background-attachment: fixed;
+            /* 滑动页面时背景不动，质感拉满 */
             color: var(--text-primary);
             line-height: 1.6;
         }
+
+        /* 到这 */
+        /* 增加毛玻璃效果 */
+        /* 🟢 让所有卡片变成半透明的毛玻璃，并加上淡淡的粉色呼吸阴影 */
+        .overview-card,
+        .overview-item,
+        .section-card,
+        .home-card,
+        .settings-item,
+        .platform-header,
+        .key-item {
+            background: rgba(255, 255, 255, 0.7) !important;
+            /* 半透明白色 */
+            backdrop-filter: blur(12px);
+            /* 苹果风毛玻璃 */
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            /* 边缘高光 */
+            box-shadow: 0 8px 20px rgba(255, 105, 180, 0.06) !important;
+            /* 甜美的浅粉阴影 */
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+            /* Q弹的动画曲线 */
+        }
+
+        /* 🟢 轻轻按住卡片时，会有可爱的缩放反应 */
+        .overview-item:active,
+        .home-card:active,
+        .settings-item:active,
+        .header-btn.circular:active {
+            transform: scale(0.92);
+            box-shadow: 0 4px 10px rgba(255, 105, 180, 0.04) !important;
+        }
+
+        /* 到这 */
+
 
         #app {
             min-height: 100vh;
@@ -138,6 +179,70 @@
             align-items: center;
             justify-content: center;
         }
+
+        /* 🟢 圆形按钮升级版：毛玻璃 + 跟随主题色 */
+        .header-btn.circular {
+    border-radius: 50%;
+    width: 38px; /* 电脑端稍大一点 */
+    height: 38px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: var(--accent) !important;
+    border: 2px solid white;
+    box-shadow: 0 4px 12px rgba(255, 105, 180, 0.15);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 🟢 手机端自适应：屏幕宽度小于 480px 时变小 */
+@media (max-width: 480px) {
+    .header-btn.circular {
+        width: 32px;
+        height: 32px;
+    }
+    .header-btn.circular .svg-icon {
+        width: 18px; /* 图标也跟着缩一点 */
+        height: 18px;
+    }
+}
+
+        /* 到这 */
+
+
+        /* 增加了特效 */
+        /* 🟢 点击掉落表情包的专属特效 */
+        @keyframes floatUpEmoji {
+            0% {
+                transform: translateY(0) scale(0.5);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translateY(-30px) scale(1.2);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translateY(-60px) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .magic-emoji {
+            position: fixed;
+            pointer-events: none;
+            /* 保证它只是个特效，不会挡住你点别的按钮 */
+            z-index: 9999;
+            animation: floatUpEmoji 0.8s ease-out forwards;
+            font-size: 22px;
+            user-select: none;
+        }
+
+        /* 到这 */
 
         .header-btn.active {
             background: var(--accent);
@@ -1116,61 +1221,140 @@
 <body>
     <div id="app">
         <div v-if="currentPage === 'home'" class="page">
-            <h1 class="page-title">API Key 管理器</h1>
-
-            <div class="overview-card">
-                <div class="overview-title">总资产</div>
-                <div class="overview-value accent">{{ totalAssetsDisplay }}</div>
+            <div class="page-header" style="margin-bottom: 24px;">
+                <!-- 改了API管理器的样式 -->
+                <h1 class="page-title"
+                    style="color: var(--accent); font-weight: 800; font-size: 24px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff, 1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff, 0 4px 12px rgba(0,0,0,0.15);">
+                     API 管理器
+                </h1>
+                <!-- 到这 -->
+                <div class="header-actions">
+                    <button class="header-btn circular" @click="refreshAllBalances" title="刷新餘額">
+                        <span class="svg-icon" v-html="icons.refresh"></span>
+                    </button>
+                    <button class="header-btn circular" @click="currentPage = 'add'" title="添加 API">
+                        <span class="svg-icon" v-html="icons.add"></span>
+                    </button>
+                </div>
             </div>
 
-            <div class="overview-grid">
-                <div class="overview-item">
-                    <div class="overview-item-title">本月消费</div>
-                    <div class="overview-item-value">{{ formatCurrency(monthlySpending, 'CNY') }}</div>
+
+            <!-- 改了钱包的HTML -->
+            <div class="overview-card" style="text-align: center; padding: 28px 16px 20px;">
+                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">总资产 (约合人民币)</div>
+                <div class="overview-value accent"
+                    style="font-size: 38px; margin-bottom: 24px; text-shadow: 0 2px 10px rgba(255,105,180,0.1);">
+                    <span style="font-size: 20px; margin-right: 2px;">¥</span>{{ assetsBreakdown.total }}
                 </div>
-                <div class="overview-item">
+
+                <div
+                    style="display: flex; justify-content: center; align-items: center; padding-top: 16px; border-top: 1px dashed rgba(255,105,180,0.2);">
+                    <div style="flex: 1;">
+                        <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">CNY 余额</div>
+                        <div style="font-size: 16px; font-weight: 600;">¥{{ assetsBreakdown.cny }}</div>
+                    </div>
+                    <div style="width: 1px; height: 24px; background: var(--accent); opacity: 0.2;"></div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">USD 余额</div>
+                        <div style="font-size: 16px; font-weight: 600;">${{ assetsBreakdown.usd }}</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 到这 -->
+
+
+            <!-- 改了主页面的卡片样式，删除了平台总数 -->
+            <div class="overview-grid"
+                style="grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+
+                <div class="overview-item"
+                    style="grid-row: span 2; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 16px; background: rgba(255, 255, 255, 0.8) !important;">
+                    <div>
+                        <div style="font-size: 13px; color: var(--text-tertiary); margin-bottom: 8px;">本月消费 (约合)</div>
+                        <div class="overview-value accent" style="font-size: 32px; font-weight: 700;">
+                            <span style="font-size: 16px; margin-right: 2px;">¥</span>{{ spendingBreakdown.total }}
+                        </div>
+                    </div>
+                    <div style="margin-top: 16px; padding-top: 16px; border-top: 1.5px dashed rgba(255,105,180,0.2);">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <div style="width: 6px; height: 6px; border-radius: 50%; background: #FF69B4;"></div>
+                                <span style="font-size: 13px; color: var(--text-secondary);">CNY 账单</span>
+                            </div>
+                            <span style="font-size: 15px; font-weight: 600;">¥{{ spendingBreakdown.cny }}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <div style="width: 6px; height: 6px; border-radius: 50%; background: #007AFF;"></div>
+                                <span style="font-size: 13px; color: var(--text-secondary);">USD 账单</span>
+                            </div>
+                            <span style="font-size: 15px; font-weight: 600;">${{ spendingBreakdown.usd }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overview-item"
+                    style="display: flex; flex-direction: column; justify-content: center; padding: 16px;">
                     <div class="overview-item-title">Key 总数</div>
-                    <div class="overview-item-value">{{ apiKeys.length }}</div>
+                    <div class="overview-item-value" style="font-size: 24px;">{{ apiKeys.length }}</div>
                 </div>
-                <div class="overview-item">
-                    <div class="overview-item-title">平台数量</div>
-                    <div class="overview-item-value">{{ activePlatformCount }}</div>
-                </div>
-                <div class="overview-item">
+
+                <div class="overview-item"
+                    style="display: flex; flex-direction: column; justify-content: center; padding: 16px;">
                     <div class="overview-item-title">即将到期</div>
-                    <div class="overview-item-value"
+                    <div class="overview-item-value" style="font-size: 24px;"
                         :style="{ color: expiringCount > 0 ? 'var(--warning)' : 'inherit' }">{{ expiringCount }}</div>
                 </div>
-            </div>
 
-            <div class="section-card">
-                <div class="section-card-title">
-                    <span class="svg-icon small" v-html="icons.list"></span>
-                    平台资产明细
+            </div>
+            <!-- 改了主页面的卡片样式，删除了平台总数 到这 -->
+
+
+            <!-- 改了平台资产明细的样式，修改了图片抓取逻辑 -->
+            <div class="section-card"
+                style="background: rgba(255, 255, 255, 0.7) !important; border: 1px solid rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
+                <div class="section-card-title" style="color: var(--accent); font-weight: 700; font-size: 15px; text-shadow: 1.5px 0 #fff, -1.5px 0 #fff, 0 1.5px #fff, 0 -1.5px #fff, 0 2px 8px rgba(0,0,0,0.1);">
+                    <span style="font-size: 18px; margin-right: 4px;">👛</span> 平台资产明细
                 </div>
+
                 <div v-if="platformStats.length === 0" class="empty-state" style="padding: 20px;">
                     <div style="color: var(--text-tertiary);">暂无数据，请先添加 API Key</div>
                 </div>
+
                 <div v-for="platform in platformStats" :key="platform.id" class="platform-card"
-                    style="box-shadow: none; background: var(--bg-secondary);">
-                    <div class="platform-icon" v-html="platform.icon"></div>
+                    style="background: rgba(255, 255, 255, 0.85); border: 1px solid #ffffff; border-radius: 16px; box-shadow: 0 4px 12px rgba(255,105,180,0.06); margin-bottom: 12px; transition: transform 0.2s;">
+
+                    <div class="platform-icon"
+                        style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 4px;">
+                        <img :src="'https://www.google.com/s2/favicons?sz=64&domain_url=' + (platforms.find(p => p.id === platform.id)?.signInUrl || 'google.com')"
+                            style="width: 24px; height: 24px; border-radius: 6px;"
+                            @error="$event.target.style.display='none'">
+                    </div>
+
                     <div class="platform-info">
-                        <div class="platform-info-name">{{ platform.name }}</div>
-                        <div class="platform-info-balance">
-                            余额: {{ formatBalance(platform.totalRemaining, platform.currency, platform.balanceType) }}
+                        <div class="platform-info-name" style="font-weight: 600; font-size: 15px;">{{ platform.name }}
+                        </div>
+                        <div class="platform-info-balance" style="font-size: 12px; color: var(--text-secondary);">
+                            余额: <span style="font-weight: 600; color: var(--text-primary); font-size: 14px;">{{
+                                formatBalance(platform.totalRemaining, platform.currency, platform.balanceType)
+                                }}</span>
                         </div>
                     </div>
+
                     <div class="platform-status">
-                        <div class="usage-percent-bar">
+                        <div class="usage-percent-bar"
+                            style="height: 6px; background: rgba(0,0,0,0.04); border-radius: 4px;">
                             <div class="usage-percent-fill" :style="{ 
                                      width: Math.min(100, platform.usagePercent || 0) + '%',
-                                     background: (platform.usagePercent || 0) > 80 ? 'var(--warning)' : 'var(--accent)'
+                                     background: (platform.usagePercent || 0) > 80 ? 'var(--warning)' : 'var(--accent)',
+                                     borderRadius: '4px'
                                  }"></div>
                         </div>
-                        <div class="status-indicator" :class="getPlatformStatus(platform)"></div>
                     </div>
                 </div>
             </div>
+            <!-- 改了平台资产明细的样式，修改了图片抓取逻辑 到这 -->
 
             <div v-if="timeLimitKeys.length > 0" class="section-card">
                 <div class="section-card-title">
@@ -1191,37 +1375,6 @@
                             {{ isExpired(key) ? '已过期' : formatTimeLeft(key.timeLimit.expireAt) }}
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="home-grid" style="margin-top: 20px;">
-                <div class="home-card" @click="currentPage = 'add'">
-                    <div class="home-card-icon">
-                        <span class="svg-icon large" v-html="icons.add"></span>
-                    </div>
-                    <div class="home-card-title">添加 API Key</div>
-                    <div class="home-card-desc">录入新的密钥</div>
-                </div>
-                <div class="home-card" @click="currentPage = 'manage'">
-                    <div class="home-card-icon">
-                        <span class="svg-icon large" v-html="icons.list"></span>
-                    </div>
-                    <div class="home-card-title">管理 API Key</div>
-                    <div class="home-card-desc">查看和编辑密钥</div>
-                </div>
-                <div class="home-card" @click="currentPage = 'stats'">
-                    <div class="home-card-icon">
-                        <span class="svg-icon large" v-html="icons.chart"></span>
-                    </div>
-                    <div class="home-card-title">查看用量</div>
-                    <div class="home-card-desc">统计图表分析</div>
-                </div>
-                <div class="home-card" @click="refreshAllBalances">
-                    <div class="home-card-icon">
-                        <span class="svg-icon large" v-html="icons.refresh"></span>
-                    </div>
-                    <div class="home-card-title">刷新余额</div>
-                    <div class="home-card-desc">更新所有平台余额</div>
                 </div>
             </div>
         </div>
@@ -1508,6 +1661,37 @@
 
         <div v-if="currentPage === 'settings'" class="page">
             <h1 class="page-title">设置</h1>
+            <!-- 1.修改部分，增加颜色选项 2、增加了心形覆盖图标 -->
+            <div class="settings-section" style="margin-top: 20px;">
+                <div class="settings-title">外观</div>
+                <div class="settings-item">
+                    <span class="settings-item-text">主题颜色</span>
+                    <!-- 修改了心形覆盖范围和大小 -->
+                    <div style="position: relative; width: 36px; height: 36px;">
+    <input type="color" v-model="themeColor" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.01; cursor: pointer; z-index: 10; border: none; appearance: none; -webkit-appearance: none;">
+    <svg viewBox="0 0 24 24" :fill="themeColor" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 5; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>
+</div>
+<!-- 修改了心形覆盖范围和大小 到这-->
+                </div>
+            </div>
+            <!-- 到这 -->
+            <!-- 自定义背景图功能 -->
+            <div class="settings-item">
+                <span class="settings-item-text">自定义背景图</span>
+                <div style="display: flex; gap: 8px;">
+                    <button class="filter-btn" v-if="customBg" @click="clearBg"
+                        style="padding: 4px 10px; font-size: 12px;">清除</button>
+                    <label class="filter-btn"
+                        style="padding: 4px 10px; font-size: 12px; cursor: pointer; margin: 0; background: var(--accent); color: white; border: none; border-radius: 8px;">
+                        上传图片
+                        <input type="file" @change="handleBgUpload" accept="image/*" style="display: none;">
+                    </label>
+                </div>
+            </div>
+            <!-- 到这 -->
+
 
             <div class="settings-section">
                 <div class="settings-title">数据管理</div>
@@ -1710,6 +1894,51 @@
 
         createApp({
             setup() {
+                // 更改部分 🟢 芥末泥的主题调色板：默认猛男粉！
+                const themeColor = ref(localStorage.getItem('themeColor') || '#ffdbdb');
+                watch(themeColor, (newColor) => {
+                    document.documentElement.style.setProperty('--accent', newColor);
+                    localStorage.setItem('themeColor', newColor);
+                }, { immediate: true });
+                // 到这
+
+                // 增加背景上传功能
+                // 🟢 芥末泥的壁纸引擎
+                const customBg = ref(localStorage.getItem('customBg') || '');
+                watch(customBg, (newBg) => {
+                    if (newBg) {
+                        document.body.style.backgroundImage = `url(${newBg})`;
+                        document.body.style.backgroundSize = 'cover';
+                        document.body.style.backgroundPosition = 'center';
+                        document.body.style.backgroundAttachment = 'fixed';
+                    } else {
+                        // 如果没有壁纸，就用默认的棉花糖渐变
+                        document.body.style.backgroundImage = 'linear-gradient(135deg, #FFF0F5 0%, #FFE4E1 50%, #E6E6FA 100%)';
+                    }
+                    localStorage.setItem('customBg', newBg || '');
+                }, { immediate: true });
+
+                function handleBgUpload(event) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    // 防止图片太大卡死浏览器，限制在 3MB 内
+                    if (file.size > 3 * 1024 * 1024) {
+                        showToast('图片太大了！请选择 3MB 以下的图片哦~');
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        customBg.value = e.target.result;
+                        showToast('壁纸换好啦！');
+                    };
+                    reader.readAsDataURL(file);
+                }
+
+                function clearBg() {
+                    customBg.value = '';
+                    showToast('已恢复默认壁纸');
+                }
+                // 增加背景上传功能 到这
                 const exchangeRates = ref({ USD: 7.25, EUR: 7.85 });
                 async function fetchExchangeRates() {
                     try {
@@ -1743,7 +1972,8 @@
                     chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
                     settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
                     add: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
-                    refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>',
+                    // 🟢 芥末泥特供：极简纤细版双箭头循环
+                    refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>',
                     openai: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.597 3.855l-5.833-3.387L15.119 7.2a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.407-.667zm2.01-3.023l-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08-4.778 2.758a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v2.999l-2.597 1.5-2.607-1.5z"/></svg>',
                     deepseek: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>',
                     zhipu: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
@@ -1976,57 +2206,68 @@
                     return platformSet.size;
                 });
 
-                const monthlySpending = computed(() => {
+                // 修改变量名 const monthlySpending -> const monthlySpendingDisplay
+                // 🟢 芥末泥特调：把本月消费也拆成三份！
+                const spendingBreakdown = computed(() => {
                     const now = new Date();
                     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-                    let total = 0;
+
+                    let cny = 0;
+                    let usd = 0;
+                    let eur = 0;
 
                     platforms.value.forEach(platform => {
                         if (platform.unmetered) return;
                         if (!platform.balance || !platform.balance.history) return;
+
+                        let platformUsed = 0;
                         platform.balance.history.forEach(record => {
                             const recordDate = record.date.split('T')[0];
                             if (recordDate >= firstDayOfMonth) {
-                                total += record.used || 0;
+                                platformUsed += record.used || 0;
                             }
                         });
+
+                        const currency = platform.currency || platform.balance.currency || 'CNY';
+                        if (currency === 'CNY') cny += platformUsed;
+                        else if (currency === 'USD') usd += platformUsed;
+                        else if (currency === 'EUR') eur += platformUsed;
                     });
 
-                    return total;
+                    let total = cny + (usd * exchangeRates.value.USD) + (eur * exchangeRates.value.EUR);
+
+                    return {
+                        total: total.toFixed(2),
+                        cny: cny.toFixed(2),
+                        usd: usd.toFixed(2)
+                    };
                 });
+                // 本月消费逻辑修改到这
+                // 修改变量名 const monthlySpending -> const monthlySpendingDisplay 到这
 
-                const totalAssetsDisplay = computed(() => {
-                    let totalInCNY = 0;
+                // 🟢 芥末泥的新逻辑：把总额、人民币、美元拆开算
+                const assetsBreakdown = computed(() => {
+                    let cny = 0;
+                    let usd = 0;
+                    let eur = 0;
 
-                    // 计算折算总额
                     platformStats.value.forEach(p => {
                         const balance = p.totalRemaining || 0;
-                        if (p.currency === 'CNY') {
-                            totalInCNY += balance;
-                        } else if (p.currency === 'USD') {
-                            totalInCNY += balance * (exchangeRates.value.USD);
-                        } else if (p.currency === 'EUR') {
-                            totalInCNY += balance * (exchangeRates.value.EUR);
-                        }
+                        if (p.currency === 'CNY') cny += balance;
+                        else if (p.currency === 'USD') usd += balance;
+                        else if (p.currency === 'EUR') eur += balance;
                     });
 
-                    // 保留你原来的原币种显示逻辑
-                    const originalParts = [];
-                    const cnyTotal = platformStats.value.filter(p => p.currency === 'CNY').reduce((sum, p) => sum + (p.totalRemaining || 0), 0);
-                    const usdTotal = platformStats.value.filter(p => p.currency === 'USD').reduce((sum, p) => sum + (p.totalRemaining || 0), 0);
+                    // 计算折合人民币的总额
+                    let total = cny + (usd * exchangeRates.value.USD) + (eur * exchangeRates.value.EUR);
 
-                    if (cnyTotal > 0) originalParts.push(`¥${cnyTotal.toFixed(2)}`);
-                    if (usdTotal > 0) originalParts.push(`$${usdTotal.toFixed(2)}`);
-
-                    let display = originalParts.length > 0 ? originalParts.join(' / ') : '¥0.00';
-
-                    // 如果有非人民币资产，额外显示一个约合总额
-                    if (usdTotal > 0 || platformStats.value.some(p => p.currency === 'EUR')) {
-                        display += ` (约合 ¥${totalInCNY.toFixed(2)})`;
-                    }
-
-                    return display;
+                    return {
+                        total: total.toFixed(2),
+                        cny: cny.toFixed(2),
+                        usd: usd.toFixed(2)
+                    };
                 });
+                //  🟢 芥末泥的新逻辑：把总额、人民币、美元拆开算 到这
 
                 const platformStats = computed(() => {
                     const stats = {};
@@ -2413,37 +2654,37 @@
                 }
 
                 function deleteKey(key) {
-    if (!confirm('确定要删除这个 API Key 吗？')) {
-        return;
-    }
-    const index = apiKeys.value.findIndex(k => k.id === key.id);
-    if (index !== -1) {
-        
-        // 🟢 芥末泥的新增逻辑：顺藤摸瓜，删掉它花的钱
-        const platform = platforms.value.find(p => p.id === key.platform);
-        if (platform && platform.balance && platform.balance.history) {
-            // 1. 算一下这个 Key 到底花了多少钱
-            const deletedHistory = platform.balance.history.filter(record => record.keyId === key.id);
-            const deletedAmount = deletedHistory.reduce((sum, record) => sum + (record.used || 0), 0);
+                    if (!confirm('确定要删除这个 API Key 吗？')) {
+                        return;
+                    }
+                    const index = apiKeys.value.findIndex(k => k.id === key.id);
+                    if (index !== -1) {
 
-            // 2. 把属于它的消费记录从账本里彻底撕掉
-            platform.balance.history = platform.balance.history.filter(record => record.keyId !== key.id);
+                        // 🟢 芥末泥的新增逻辑：顺藤摸瓜，删掉它花的钱
+                        const platform = platforms.value.find(p => p.id === key.platform);
+                        if (platform && platform.balance && platform.balance.history) {
+                            // 1. 算一下这个 Key 到底花了多少钱
+                            const deletedHistory = platform.balance.history.filter(record => record.keyId === key.id);
+                            const deletedAmount = deletedHistory.reduce((sum, record) => sum + (record.used || 0), 0);
 
-            // 3. 把总消费的钱扣回来
-            if (platform.balance.totalUsed) {
-                platform.balance.totalUsed -= deletedAmount;
-                // 防止出现负数
-                if (platform.balance.totalUsed < 0) platform.balance.totalUsed = 0; 
-            }
-        }
-        // 🟢 新增逻辑结束
+                            // 2. 把属于它的消费记录从账本里彻底撕掉
+                            platform.balance.history = platform.balance.history.filter(record => record.keyId !== key.id);
 
-        apiKeys.value.splice(index, 1);
-        saveToStorage();
-        showToast('已删除');
-        updateChart();
-    }
-}
+                            // 3. 把总消费的钱扣回来
+                            if (platform.balance.totalUsed) {
+                                platform.balance.totalUsed -= deletedAmount;
+                                // 防止出现负数
+                                if (platform.balance.totalUsed < 0) platform.balance.totalUsed = 0;
+                            }
+                        }
+                        // 🟢 新增逻辑结束
+
+                        apiKeys.value.splice(index, 1);
+                        saveToStorage();
+                        showToast('已删除');
+                        updateChart();
+                    }
+                }
 
                 function toggleKeyVisibility(key) {
                     key.showKey = !key.showKey;
@@ -2538,35 +2779,35 @@
                     return current;
                 }
 
-               // 修改参数，增加 keyId
-function handlePlatformBalanceChange(platform, newRemaining, keyId = null) {
-    const oldRemaining = platform.balance?.remaining;
-    const isFirstQuery = oldRemaining === undefined || oldRemaining === null;
-    const currency = platform.currency || platform.balance?.currency || 'CNY';
+                // 修改参数，增加 keyId
+                function handlePlatformBalanceChange(platform, newRemaining, keyId = null) {
+                    const oldRemaining = platform.balance?.remaining;
+                    const isFirstQuery = oldRemaining === undefined || oldRemaining === null;
+                    const currency = platform.currency || platform.balance?.currency || 'CNY';
 
-    if (!platform.balance) {
-        platform.balance = { 
-            total: 0, 
-            remaining: 0, 
-            totalUsed: 0, 
-            currency: currency,
-            lastQuery: null,
-            history: []
-        };
-    }
+                    if (!platform.balance) {
+                        platform.balance = {
+                            total: 0,
+                            remaining: 0,
+                            totalUsed: 0,
+                            currency: currency,
+                            lastQuery: null,
+                            history: []
+                        };
+                    }
 
-    if (!isFirstQuery && oldRemaining > newRemaining) {
-        const used = oldRemaining - newRemaining;
-        platform.balance.totalUsed = (platform.balance.totalUsed || 0) + used;
+                    if (!isFirstQuery && oldRemaining > newRemaining) {
+                        const used = oldRemaining - newRemaining;
+                        platform.balance.totalUsed = (platform.balance.totalUsed || 0) + used;
 
-        if (!platform.balance.history) platform.balance.history = [];
-        platform.balance.history.push({
-            date: new Date().toISOString(),
-            used: used,
-            balance: newRemaining,
-            keyId: keyId // 🟢 关键改动：给每笔消费记上是谁花的
-        });
-    // ... 下面代码保持不变
+                        if (!platform.balance.history) platform.balance.history = [];
+                        platform.balance.history.push({
+                            date: new Date().toISOString(),
+                            used: used,
+                            balance: newRemaining,
+                            keyId: keyId // 🟢 关键改动：给每笔消费记上是谁花的
+                        });
+                        // ... 下面代码保持不变
                     } else if (!isFirstQuery && newRemaining > oldRemaining) {
                         const diff = newRemaining - oldRemaining;
                         if (diff > 0) {
@@ -2798,7 +3039,7 @@ function handlePlatformBalanceChange(platform, newRemaining, keyId = null) {
                             if (balance !== null && balance !== undefined) {
                                 const newRemaining = parseFloat(balance);
 
-                                handlePlatformBalanceChange(platform, newRemaining,key.id);
+                                handlePlatformBalanceChange(platform, newRemaining, key.id);
                                 successCount++;
                             } else {
                                 failCount++;
@@ -3128,6 +3369,10 @@ function handlePlatformBalanceChange(platform, newRemaining, keyId = null) {
 
                 return {
                     icons,
+                    themeColor,  //增加颜色变量
+                    customBg,       // 🟢 颜色变量和背景图变量
+                    handleBgUpload, // 🟢 
+                    clearBg,        // 🟢
                     platformsWithKeys, // 补上这个，解决控制台那个黄色警告
                     exchangeRates,
                     fetchExchangeRates,
@@ -3153,8 +3398,9 @@ function handlePlatformBalanceChange(platform, newRemaining, keyId = null) {
                     expiringCount,
                     timeLimitKeys,
                     activePlatformCount,
-                    monthlySpending,
-                    totalAssetsDisplay,
+                    // 改了变量名 monthlySpending-> monthlySpendingDisplay
+                    spendingBreakdown, //改了变量名 monthlySpendingDisplay-> spendingBreakdown
+                    assetsBreakdown,   //改了变量名 totalAssetsDisplay-> assetsBreakdown
                     platformStats,
                     usageRanking,
                     getPlatformStatus,
@@ -3209,6 +3455,26 @@ function handlePlatformBalanceChange(platform, newRemaining, keyId = null) {
                 };
             }
         }).mount('#app');
+        // 增加了emoji掉落的效果
+        // 🟢 芥末泥的魔法：全局点击掉落表情包特效
+        document.addEventListener('click', function (e) {
+            // 这里是你专属的表情包库，可以随便往里加喜欢的 emoji！
+            const emojis = ['✨', '💖', '🌸', '🍬', '🎀', '🪄', '⭐', '🍓'];
+            const emoji = document.createElement('div');
+            emoji.className = 'magic-emoji';
+            emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+
+            // 让表情从你点击的指尖中心冒出来
+            emoji.style.left = (e.clientX - 11) + 'px';
+            emoji.style.top = (e.clientY - 11) + 'px';
+            document.body.appendChild(emoji);
+
+            // 800毫秒后动画结束，静静地把它扫走
+            setTimeout(() => {
+                emoji.remove();
+            }, 800);
+        });
+        // 到这
     </script>
 </body>
 
